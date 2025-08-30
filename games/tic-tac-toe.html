@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style-ttt.css">
+  <title>Tic Tac Toe</title>
+</head>
+<body>
+  <header>
+    <h1>Tic Tac Toe</h1>
+    <div>
+      <button id="Computer">Computer</button>
+      <button id="Opponent">2 Players</button>
+    </div>
+  </header>
+
+  <main>
+    <span id="show"></span>
+    <div class="game">
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+      <div class="cell"></div>
+    </div>
+    <p id="status" class="status"></p>
+  </main>
+  
+  <script>
+    const cells = document.querySelectorAll(".cell");
+    const status = document.getElementById("status");
+    const computerBtn = document.getElementById("Computer");
+    const opponentBtn = document.getElementById("Opponent");
+
+    let gameOver = false;
+    let vsComputer = true;
+    let currentPlayer = "X";
+
+    function show() {
+        if(!vsComputer){
+        document.getElementById('show').innerText = '2 Players'
+
+    } else {
+        document.getElementById('show').innerText = 'Computer'
+    }
+    }
+    show()
+    const winPatterns = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function checkWinner() {
+      for (let pattern of winPatterns) {
+        const [a,b,c] = pattern;
+        if (cells[a].textContent &&
+            cells[a].textContent === cells[b].textContent &&
+            cells[a].textContent === cells[c].textContent) {
+          status.textContent = `${cells[a].textContent} Wins 🎉`;
+          gameOver = true;
+          return true;
+        }
+      }
+      if ([...cells].every(cell => cell.textContent !== "")) {
+        status.textContent = "It's a Draw 😮";
+        gameOver = true;
+      }
+      return false;
+    }
+
+    function computerMove() {
+      if (gameOver) return;
+
+      for (let pattern of winPatterns) {
+        const [a,b,c] = pattern;
+        let values = [cells[a].textContent, cells[b].textContent, cells[c].textContent];
+        if (values.filter(v => v === "O").length === 2 && values.includes("")) {
+          let move = [a,b,c][values.indexOf("")];
+          cells[move].textContent = "O";
+          cells[move].classList.add("taken");
+          checkWinner();
+          currentPlayer = "X";
+          return;
+        }
+      }
+
+      for (let pattern of winPatterns) {
+        const [a,b,c] = pattern;
+        let values = [cells[a].textContent, cells[b].textContent, cells[c].textContent];
+        if (values.filter(v => v === "X").length === 2 && values.includes("")) {
+          let move = [a,b,c][values.indexOf("")];
+          cells[move].textContent = "O";
+          cells[move].classList.add("taken");
+          checkWinner();
+          currentPlayer = "X";
+          return;
+        }
+      }
+
+      let emptyCells = [...cells].filter(c => c.textContent === "");
+      if (emptyCells.length > 0) {
+        let choice = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        choice.textContent = "O";
+        choice.classList.add("taken");
+      }
+      checkWinner();
+      currentPlayer = "X";
+    }
+
+
+    function handleClick(e) {
+      if (gameOver) return;
+      const cell = e.target;
+      if (cell.textContent !== "") return;
+
+      cell.textContent = currentPlayer;
+      cell.classList.add("taken");
+      if (checkWinner()) return;
+
+      if (vsComputer && currentPlayer === "X") {
+        currentPlayer = "O";
+        setTimeout(computerMove, 500);
+      } else {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+      }
+    }
+
+    function resetGame() {
+      cells.forEach(c => { c.textContent = ""; c.classList.remove("taken"); });
+      gameOver = false;
+      currentPlayer = "X";
+      status.textContent = "";
+    }
+
+    cells.forEach(cell => cell.addEventListener("click", handleClick));
+    computerBtn.addEventListener("click", () => { 
+        vsComputer = true; 
+        resetGame(); 
+        show()
+    });
+    opponentBtn.addEventListener("click", () => { 
+        vsComputer = false; 
+        resetGame(); 
+        show()
+    });
+
+    
+
+  </script>
+</body>
+</html>

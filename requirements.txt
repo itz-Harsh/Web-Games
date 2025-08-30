@@ -1,0 +1,4 @@
+flask-cors
+SpeechRecognition
+flask
+

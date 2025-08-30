@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+}
+
+:root{
+    --bg-1: #071226; /* deep indigo */
+    --bg-2: #0d1b33; /* darker indigo */
+    --accent-a: #7ef9c7; /* mint */
+    --accent-b: #ffd6a5; /* soft peach */
+    --glow-a: rgba(126,249,199,0.12);
+    --glow-b: rgba(255,214,165,0.10);
+    --card-shadow: rgba(2,6,23,0.7);
+}
+
+body{
+    font-family: "Caveat", cursive;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    background: radial-gradient(1000px 600px at 10% 10%, var(--glow-a), transparent 8%),
+                radial-gradient(800px 500px at 90% 90%, var(--glow-b), transparent 6%),
+                linear-gradient(180deg,var(--bg-1), var(--bg-2));
+}
+main{
+    height: 50vmin;
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+}
+h1{
+    font-weight: 1000;
+    font-size: 5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: #adadad 0px 0px 10px;
+    animation: bounce 2s infinite;
+}
+
+h1{
+    background: linear-gradient(90deg,var(--accent-a), var(--accent-b));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.heading{
+    font-size: 3rem;
+    font-weight: 500;
+    color: #cfcfcf;
+    text-shadow: #000000 0px 0px 10px;
+}
+
+.heading{opacity:0.95}
+
+@keyframes bounce {
+    0% , 20% , 40% , 60% , 80% , 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+    75% { transform: translateY(-3px); }  
+}
+a{
+    text-decoration: none;
+    /* color: white; */
+}
+p{
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: rgb(24, 24, 24);
+    text-shadow: #000000 0px 0px 1px;
+    margin-right: 1pc;
+}
+.card{
+    height: 30vmin;
+    width: 40vmin;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.card{
+    transition: transform 0.35s cubic-bezier(.2,.9,.2,1), box-shadow 0.35s;
+    box-shadow: 0 12px 30px var(--card-shadow), 0 3px 8px rgba(0,0,0,0.35);
+    transform-origin: center;
+    will-change: transform;
+}
+
+.card:hover{
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 22px 60px rgba(7,12,30,0.7), 0 6px 18px rgba(0,0,0,0.5);
+    z-index: 3;
+}
+
+/* subtle colored glow that appears on hover */
+.card::after{
+    content: '';
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(400px 200px at 20% 10%, var(--glow-a), transparent 10%),
+                radial-gradient(300px 150px at 80% 90%, var(--glow-b), transparent 12%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+}
+.card:hover::after{ opacity: 1; }
+
+/* hover visuals handled on inner .info element; no global card size changes */
+
+
+#t-t-t{
+    position: absolute;
+    inset: 0;
+    background-image: url('assets/tic-tac-toe-game-with-hearts-crosses.jpg');
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    transition: transform 0.3s;
+    z-index: 0;
+}
+/* make the image span fill the card */
+/* subtle hover zoom on the background image */
+#t-t-t{ will-change: transform; }
+#t-t-t:hover{ transform: scale(1.04); }
+
+
+/* make the image span fill the card */
+/* make the second card image behave similarly */
+#r-p-s{
+    position: absolute;
+    inset: 0;
+    background-image: url('assets/rock-paper-scissors.png');
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    transition: transform 0.3s;
+    z-index: 0;
+    will-change: transform;
+}
+#r-p-s:hover{ transform: scale(1.04); }
+
+/* New info panel inside card */
+.card .info{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(8,16,36,0.45) 50%, rgba(6,10,28,0.78) 100%);
+    transition: transform 0.28s ease, opacity 0.28s ease;
+    transform: translateY(35%);
+    opacity: 0;
+    z-index: 2;
+}
+
+.card:hover .info{
+    transform: translateY(0%);
+    opacity: 1;
+}
+
+.card .title{
+    font-size: 1.6rem;
+    color: #fff;
+    text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+
+.card .desc{
+    font-size: 1.25rem;
+    color: #dcdcdc;
+    max-width: 85%;
+    line-height: 1.2;
+    opacity: 0.95;
+}
+
+/* keyboard accessibility focus state */
+.card:focus-within{
+    outline: 2px solid rgba(110,231,255,0.12);
+    box-shadow: 0 18px 40px rgba(14,20,40,0.6), 0 0 32px rgba(110,231,255,0.06);
+}

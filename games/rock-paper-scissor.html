@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="style-rps.css">
+    <title>Rock Paper Scissors</title>
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <h1>Rock · Paper · Scissors</h1>
+            <div>
+                <button id="voiceBtn">🎤  Speak</button>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="choices" role="group" aria-label="Pick your move">
+                <div class="choice" data-choice="rock">✊<div class="small">Rock</div></div>
+                <div class="choice" data-choice="paper">✋<div class="small">Paper</div></div>
+                <div class="choice" data-choice="scissors">✌️<div class="small">Scissors</div></div>
+            </div>
+        </div>
+
+        <div class="status" >Click a choice or press Speak</div>
+        <div class="score"><div>You: <span id="youScore">0</span></div><div>Computer: <span id="compScore">0</span></div></div>
+    </div>
+
+    <script>
+        const voiceBtn = document.getElementById('voiceBtn');
+        const statusEl = document.querySelector('.status');
+        const youScoreEl = document.getElementById('youScore');
+        const compScoreEl = document.getElementById('compScore');
+
+        let you = 0, comp = 0;
+
+        async function audio(){
+            try{
+                const res = await fetch('http://127.0.0.1:5000/listen');
+                if(!res.ok) return 'error';
+                const data = await res.json();
+                // backend may return { choice: 'rock' } or plain string
+                if(typeof data === 'string') return data.toLowerCase();
+                if(data && data.choice) return String(data.choice).toLowerCase();
+                return 'invalid';
+            }catch(e){
+                return 'error';
+            }
+        }
+
+        function playgame(choice){
+            const valid = ['rock','paper','scissors'];
+            choice = (choice||'').toLowerCase();
+            if(!valid.includes(choice)){
+                statusEl.textContent = "Didn't catch that! Try Rock, Paper, or Scissors.";
+                return;
+            }
+
+            const compChoice = valid[Math.floor(Math.random()*3)];
+            const wins = { rock: 'scissors', paper: 'rock', scissors: 'paper' };
+            let result;
+            if(choice === compChoice) result = 'Draw';
+            else if(wins[choice] === compChoice){ result='You win'; you++; }
+            else { result='You lose'; comp++; }
+
+            youScoreEl.textContent = you;
+            compScoreEl.textContent = comp;
+
+            const cap = s => s[0].toUpperCase() + s.slice(1);
+            statusEl.textContent = `You: ${cap(choice)} — Computer: ${cap(compChoice)} — ${result}!`;
+        }
+
+        // clickable choices
+        document.querySelectorAll('.choice').forEach(el => {
+            el.addEventListener('click', () => playgame(el.dataset.choice));
+        });
+
+        // voice button: call backend then play
+        voiceBtn.addEventListener('click', async () => {
+            voiceBtn.disabled = true;
+            statusEl.textContent = 'Listening...';
+            const choice = await audio();
+            voiceBtn.disabled = false;
+            if(choice === 'error'){
+                statusEl.textContent = 'Voice backend not reachable.';
+                return;
+            }
+            if(choice === 'invalid'){
+                statusEl.textContent = "Didn't catch that — try again.";
+                return;
+            }
+            playgame(choice);
+        });
+    </script>
+</body>
+</html>
