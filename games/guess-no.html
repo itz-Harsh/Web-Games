@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style-gn.css">
+        <title>Guess the Number</title>
+    </head>
+
+    <body>
+        <div class="wrap">
+            <header>
+                <h1>Guess the Number 🔢</h1>
+                <div class="modes">
+                    <button class="btn mode" data-mode="4">4</button>
+                    <button class="btn mode" data-mode="5">5</button>
+                    <button class="btn mode" data-mode="6">6</button>
+                </div>
+            </header>
+
+            <main>
+                <p class="hint">Pick a card to guess the hidden number. Incorrect picks disable that card.</p>
+                <div class="panel" id="panel" aria-live="polite"></div>
+
+                <div class="controls">
+                    <button id="reset" class="btn">Reset 🔁</button>
+                    <div id="status" class="status"></div>
+                </div>
+            </main>
+        </div>
+
+        <script>
+            // Elements
+            const panel = document.getElementById('panel');
+            const status = document.getElementById('status');
+            const resetBtn = document.getElementById('reset');
+            const modeButtons = document.querySelectorAll('.mode');
+
+            // Game state
+            let mode = 4;
+            let options = [];
+            let hidden = null;
+            let gameOver = false;
+
+
+            function uniqueRandomArray(len){
+                const set = new Set();
+                while(set.size < len){
+                    set.add(Math.floor(Math.random()*100) + 1);
+                }
+                return Array.from(set);
+            }
+
+            function render(){
+                panel.innerHTML = '';
+                options.forEach((n, i) => {
+                    const span = document.createElement('button');
+                    span.className = 'card';
+                    span.type = 'button';
+                    span.dataset.value = n;
+                    span.textContent = n;
+                    span.addEventListener('click', () => onPick(i, span));
+                    panel.appendChild(span);
+                });
+            }
+
+            function startNew(m = 4){
+                mode = m;
+                options = uniqueRandomArray(mode);
+                // choose hidden value from options
+                hidden = options[Math.floor(Math.random()*options.length)];
+                gameOver = false;
+                status.textContent = 'Find the hidden number!';
+                render();
+            }
+
+            function onPick(index, el){
+                if(gameOver) return;
+                const val = Number(el.dataset.value);
+
+                // immediately disable all cards to prevent further picks
+                [...panel.children].forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('disabled');
+                });
+
+                // mark clicked
+                if(val === hidden){
+                    el.classList.remove('disabled');
+                    el.classList.add('correct');
+                    status.textContent = `Correct 🎉 — the hidden number was ${hidden}`;
+                } else {
+                    el.classList.remove('disabled');
+                    el.classList.add('wrong');
+                    status.textContent = `Wrong ✖️ — the hidden number was ${hidden}`;
+                }
+
+                // reveal and highlight the correct card
+                [...panel.children].forEach(btn => {
+                    const v = Number(btn.dataset.value);
+                    if(v === hidden) btn.classList.add('correct');
+                    else if(!btn.classList.contains('correct')) btn.classList.add('muted');
+                });
+
+                gameOver = true;
+            }
+
+            function revealAll(){
+                [...panel.children].forEach(btn => {
+                    const v = Number(btn.dataset.value);
+                    btn.disabled = true;
+                    if(v === hidden) btn.classList.add('correct');
+                    else btn.classList.add('muted');
+                });
+            }
+
+            // hook mode buttons
+            modeButtons.forEach(b => b.addEventListener('click', () => {
+                const m = Number(b.dataset.mode);
+                startNew(m);
+                // mark active
+                modeButtons.forEach(x => x.classList.toggle('active', x === b));
+            }));
+
+            resetBtn.addEventListener('click', () => startNew(mode));
+
+            startNew(mode);
+
+            modeButtons[0].classList.add('active');
+        </script>
+    </body>
+
+    </html>
