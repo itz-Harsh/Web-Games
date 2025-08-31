@@ -146,6 +146,22 @@ p{
 }
 #r-p-s:hover{ transform: scale(1.04); }
 
+
+#gn{
+    position: absolute;
+    inset: 0;
+    background-image: url('assets/guess-no.jpg');
+    background-size: cover;
+    background-position: center;
+    background-color: transparent;
+    transition: transform 0.3s;
+    z-index: 0;
+    will-change: transform;
+}
+#gn:hover{ transform: scale(1.04); }
+
+
+
 /* New info panel inside card */
 .card .info{
     position: absolute;
